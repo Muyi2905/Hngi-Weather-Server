@@ -10,7 +10,8 @@ app.get('/api/hello', async (req, res) => {
   const clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
 
   try {
-    const weatherResponse = await axios.get(`http://api.openweathermap.org/data/2.5/weather?q=${clientIp}&appid=${process.env.OPENWEATHER_API_KEY}&units=metric`);
+   
+    const weatherResponse = await axios.get(`http://api.openweathermap.org/data/2.5/weather?q=${location}&appid=${process.env.OPENWEATHER_API_KEY}&units=metric`);
     const temperature = weatherResponse.data.main.temp;
     const location = weatherResponse.data.name;
 
