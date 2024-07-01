@@ -7,10 +7,10 @@ const port = process.env.PORT || 3000;
 
 app.get('/api/hello', async (req, res) => {
     const visitorName = req.query.visitor_name || 'Guest';
-    const clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress || '8.8.8.8'; // Fallback to Google's DNS IP
+    const clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress 
   
     try {
-      console.log('Client IP:', clientIp); // Log the IP for debugging
+      console.log('Client IP:', clientIp); 
       const response = await axios.get(`http://api.weatherapi.com/v1/current.json?key=${process.env.WEATHER_API_KEY}&q=${clientIp}`);
       const data = response.data;
   
