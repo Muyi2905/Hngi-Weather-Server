@@ -10,18 +10,13 @@ app.get('/api/hello', async (req, res) => {
   const clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
 
   try {
-   
-    const locationResponse = await axios.get(`https://ipapi.co/${clientIp}/json/`);
-    const location = locationResponse.data.city || 'Unknown';
-
-  
-    const weatherResponse = await axios.get(`http://api.openweathermap.org/data/2.5/weather?q=${location}&appid=${process.env.OPENWEATHER_API_KEY}&units=metric`);
-    const temperature = weatherResponse.data.main.temp;
+    const apiResponse = await axios.get(`http://api.ipstack.com/${clientIp}?access_key=${process.env.IPSTACK_API_KEY}&fields=city,temperature`);
+    const { city, temperature } = apiResponse.data;
 
     res.json({
       client_ip: clientIp,
-      location: location,
-      greeting: `Hello, ${visitorName}! The temperature is ${temperature} degrees Celsius in ${location}`
+      location: city,
+      greeting: `Hello, ${visitorName}! The temperature is ${temperature} degrees Celsius in ${city}`
     });
   } catch (error) {
     console.error('Error:', error.message);
