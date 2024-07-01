@@ -1,38 +1,39 @@
-app.get("/api/hello", async (req, res) => {
-    const visitor = req.query.visitor;
-    const clientIp = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+const express = require('express');
+const axios = require('axios');
+require('dotenv').config();
 
-    try {
-        console.log('Client IP:', clientIp);
-        const locationResponse = await axios.get(`http://ip-api.com/json/${clientIp}`);
-        const locationData = locationResponse.data;
-        console.log('Location data:', locationData);
+const app = express();
+const port = process.env.PORT || 3000;
 
-        const city = locationData.city;
-        console.log('City:', city);
+app.get('/api/hello', async (req, res) => {
+  const visitorName = req.query.visitor_name;
+  const clientIp = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+  
+  try {
+   
+    const locationResponse = await axios.get(`http://ip-api.com/json/${clientIp}`);
+    const locationData = locationResponse.data;
+    const city = locationData.city;
 
-        if (!city) {
-            throw new Error('Unable to determine city from IP address');
-        }
+    const apiKey = process.env.OPENWEATHERMAP_API_KEY;
+    const weatherResponse = await axios.get(`http://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${apiKey}`);
+    const weatherData = weatherResponse.data;
+    const temperature = weatherData.main.temp;
 
-        const apiKey = process.env.OPENWEATHERMAP_API_KEY;
-        const weatherResponse = await axios.get(`http://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${apiKey}`);
-        const weatherData = weatherResponse.data;
-        const temperature = weatherData.main.temp;
+   
+    const response = {
+      client_ip: clientIp,
+      location: city,
+      greeting: `Hello, ${visitorName}! The temperature is ${temperature} degrees Celsius in ${city}`
+    };
 
-        const response = {
-            client_IpAddress: clientIp,
-            location: locationData,
-            temperature: temperature,
-            greeting: `Hello, ${visitor}! The temperature is ${temperature} degrees Celsius in ${city}`
-        };
+    res.json(response);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
 
-        res.json(response);
-    } catch (error) {
-        console.error('Error details:', error.message);
-        if (error.response) {
-            console.error('Error response:', error.response.data);
-        }
-        res.status(500).send('Internal Server Error');
-    }
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
 });
