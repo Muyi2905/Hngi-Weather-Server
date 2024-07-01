@@ -16,9 +16,18 @@ try {
     const weatherData = weatherResponse.data;
     const Temperature = weatherData.main.temp;
 
-    const
+    const response = {
+        client_IpAddress : clientIp,
+        location : locationData,
+        Temperature : Temperature,
+       greeting: `Hello, ${visitor}! The temperature is ${Temperature} degrees Celsius in ${city}`
+    }
+
+    res.json(response)
 
 } catch (error) {
+    console.error(error)
+    res.status(500).send('internal Server Error')
     
 }
 
